@@ -3,9 +3,13 @@ require_relative 'Question.rb'
 
 class Game
 
+  @@new_turn_string = "----- NEW TURN -----"
+
   def initialize(num_players)
+    @initial_player_count = num_players
     @players = assign_players(num_players)
-    # @current_player = next_turn
+    @current_player_index = -1
+    @continue = true
     play
   end
 
@@ -22,31 +26,51 @@ class Game
   end
 
   def next_turn
-    
+    if @current_player_index < @players.length - 1
+      @current_player_index += 1
+    else
+      @current_player_index = 0
+    end
+
+    puts @@new_turn_string
+    @players[@current_player_index].generate_question
   end
   
   def play
     puts "Looks like we've got the following players: "
 
-    @players[0].update_lives
-
     @players.each {|player| puts "Player # #{player.number}: #{player.name}. Has #{player.lives} lives."} 
 
-    game_over?
+    while @continue do
+      next_turn
+      game_over?
+    end
+
   end
 
   def game_over?
-    update_players
+    
+    if @initial_player_count > 1 
+      update_players
+      if @players.length == 1
+  
+        winner_string =  "* Player ##{@players[0].number} is the last player standing! #{@players[0].name} is the winner! *"
+        border = '*' * winner_string.length
+        
+        puts border, winner_string, border
+  
+        @continue = false
+      end
+    else
+      player = @players[0]
+      if player.lives <= 0 
+        winner_string = "# Nice try #{player.name}! You lasted for #{player.questions.length} turns! #"
+        border = '#' * winner_string.length
+        
+        puts border, winner_string, border
 
-    if @players.length == 1
-
-      winner_string =  "* Player ##{@players[0].number} is the last player standing! #{@players[0].name} is the winner! *"
-      border = '*' * winner_string.length
-      puts border
-      puts winner_string
-      puts border
-
-      exit(0)
+        @continue = false
+      end
     end
   end
 
