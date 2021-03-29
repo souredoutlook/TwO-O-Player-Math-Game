@@ -36,6 +36,21 @@ class Game
   end
 
   def game_over?
+    update_players
+
+    if @players.length == 1
+
+      winner_string =  "* Player ##{@players[0].number} is the last player standing! #{@players[0].name} is the winner! *"
+      border = '*' * winner_string.length
+      puts border
+      puts winner_string
+      puts border
+
+      exit(0)
+    end
+  end
+
+  def update_players
     updated_players = []
     @players.each {|player|
       if player.lives <= 0
@@ -45,11 +60,7 @@ class Game
       end
     }
 
-    @players = updated_players;
-
-    if @players.length == 1
-      puts "Player ##{@players[0].number} is the last player standing! #{@players[0].name} is the winner!"
-      exit(0)
-    end
+    @players = updated_players;  
   end
+
 end
